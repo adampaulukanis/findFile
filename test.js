@@ -7,19 +7,28 @@ const
 ;
 
 describe('testing findFile:', function () {
-  it('find non existing file, should give error', function () {
-    let randomString = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10); /* this is only pseudo-random but who cares? ;-) */
-    /* make sure the random file does not exist! */
-    try {
-      fs.accessSync(`${randomString}.txt`);
-      console.error(`${randomString}.txt file already exists! Exiting with error`);
-      process.exit(1); // exit with error
-    }
-    catch (err) { /* it is OK, carry on */ }
-
-    findFile('.', `${randomString}.txt`, function (err, path) {
+  it('find the index.js file', function (done) {
+    /* There will be more then one match! */
+    findFile('.', 'index.js', function (err, path) {
+      assert.equal(err, null);
+      assert.ok(path, './index.js');
+    });
+    done();
+  });
+  it('how to test if there is no match?', function () {
+    findFile('.', 'misiaki.txt', function (err, path) {
+      assert(false);
+      /* this code is broken */
+      console.log({err: err, path: path});
+      assert.equal(err, null);
+      assert.equal(path, null);
+    });
+  });
+  it('path is wrong, should give error', function (done) {
+    findFile('.xx', 'sssindex.js', function (err, path) {
       assert.ok(err instanceof Error);
-      assert.equal(typeof path, 'undefined');
+      assert.equal(path, null); // path should be empty; file not found
+      done();
     });
   });
 });
