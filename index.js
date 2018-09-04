@@ -23,6 +23,7 @@ function findFile(path, searchFile, callback) {
   }
 
   // Read and stat a directory
+  // Read a path and call the callback for each file
   function statDirectory(path, callback) {
     fs.readdir(path, function (err, files) {
       if (err) return callback(err);
