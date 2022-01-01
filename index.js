@@ -1,37 +1,21 @@
 'use strict';
 
-const
-  fs = require('fs')
-;
+const pathModule = require('path');
+const PathIterator = require('./PathIterator.js');
 
 function findFile(path, searchFile, callback) {
-  // start the search
-  statDirectory(path, isMatch);
+  let pi = new PathIterator();
+  pi.on('file', function (file, _stats) {
+    if (pathModule.basename(file) === searchFile) {
+      callback(undefined, file);
+    }
+  });
+  pi.on('directory', function (path, _stats) {
+    findFile(path, searchFile, callback);
+  });
+  pi.on('error', callback);
 
-  // Check for a match, given filepath and filename
-  function isMatch(err, fpath, file) {
-    if (err) return callback(err);
-    fs.stat(fpath, function (err, stats) {
-      if (err) return callback(err);
-      if (stats.isFile() && file == searchFile) {
-        return callback(null, fpath);
-      }
-      else if (stats.isDirectory()) {
-        statDirectory(fpath, isMatch);
-      }
-    });
-  }
-
-  // Read and stat a directory
-  // Read a path and call the callback for each file
-  function statDirectory(path, callback) {
-    fs.readdir(path, function (err, files) {
-      if (err) return callback(err);
-      files.forEach(function (file) {
-        callback(null, path+'/'+file, file);
-      });
-    });
-  };
-};
+  pi.iterate(path); // start it
+}
 
 module.exports = findFile;

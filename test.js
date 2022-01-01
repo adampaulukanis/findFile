@@ -1,34 +1,30 @@
 'use strict';
 
-const
-  findFile = require('.')
-, assert = require('assert')
-, fs = require('fs')
-;
+const PathIterator = require('./PathIterator.js'),
+  clog = console.log;
 
 describe('testing findFile:', function () {
-  it('find the index.js file', function (done) {
-    /* There will be more then one match! */
-    findFile('.', 'index.js', function (err, path) {
-      assert.equal(err, null);
-      assert.ok(path, './index.js');
-    });
-    done();
-  });
-  it('how to test if there is no match?', function () {
-    findFile('.', 'misiaki.txt', function (err, path) {
-      assert(false);
-      /* this code is broken */
-      console.log({err: err, path: path});
-      assert.equal(err, null);
-      assert.equal(path, null);
-    });
-  });
-  it('path is wrong, should give error', function (done) {
-    findFile('.xx', 'sssindex.js', function (err, path) {
-      assert.ok(err instanceof Error);
-      assert.equal(path, null); // path should be empty; file not found
-      done();
+  it('find the tags files', function () {
+    function findFile(path, searchFile, callback) {
+      let pi = new PathIterator();
+      pi.on('file', function (file, _stats) {
+        if (file == searchFile) {
+          callback(undefined, file);
+        }
+      });
+      pi.on('error', callback);
+      pi.iterate(path);
+    }
+
+    findFile('.', 'tags', function (err, file) {
+      if (err) {
+        clog('Error has occured');
+        clog(err);
+        return;
+      }
+      clog('File found at ' + file);
     });
   });
+  it('how to test if there is no match?');
+  it('path is wrong, should give error');
 });
