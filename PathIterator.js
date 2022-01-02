@@ -16,7 +16,7 @@ PathIterator.prototype.iterate = function (path) {
     if (stats.isFile()) {
       self.emit('file', fpath, stats);
     } else if (stats.isDirectory()) {
-      self.emit('directory', fpath, stats);
+      // self.emit('directory', fpath, stats);
       self.iterate(fpath);
     }
   });
